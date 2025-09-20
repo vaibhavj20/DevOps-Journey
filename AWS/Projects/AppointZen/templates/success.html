@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking Confirmed - AppointZen</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body class="success-page">
+    <!-- Success Modal Overlay -->
+    <div class="success-overlay" id="successOverlay">
+      <div class="success-modal">
+        <div class="success-header">
+          <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h2>Booking Confirmed!</h2>
+          <p>Thank you, {{ name }}! Your appointment is all set.</p>
+        </div>
+
+        <div class="appointment-summary">
+          <div class="summary-item">
+            <i class="fas fa-calendar"></i>
+            <div>
+              <span class="label">Date</span>
+              <span class="value">{{ date }}</span>
+            </div>
+          </div>
+          <div class="summary-item">
+            <i class="fas fa-clock"></i>
+            <div>
+              <span class="label">Time</span>
+              <span class="value">{{ time }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <a href="/" class="btn btn-primary">
+            <i class="fas fa-home"></i>
+            Back to Home
+          </a>
+          <a href="/book" class="btn btn-outline">
+            <i class="fas fa-plus"></i>
+            Book Another
+          </a>
+        </div>
+
+        <div class="success-note">
+          <i class="fas fa-check-circle"></i>
+          <span>Your appointment has been successfully scheduled</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Auto redirect after 10 seconds
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 10000);
+    </script>
+  </body>
+</html>

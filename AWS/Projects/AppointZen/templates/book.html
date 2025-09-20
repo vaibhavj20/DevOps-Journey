@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment - AppointZen</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body class="booking-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <a href="/">
+            <i class="fas fa-calendar-check"></i>
+            <span>AppointZen</span>
+          </a>
+        </div>
+        <div class="nav-menu">
+          <a href="/" class="nav-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="booking-container">
+      <div class="booking-content">
+        <div class="booking-header">
+          <h1>Book Your Appointment</h1>
+          <p>
+            Fill in your details below and we'll confirm your appointment
+            instantly
+          </p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ error }}
+        </div>
+        {% endif %}
+
+        <div class="booking-wrapper">
+          <form method="POST" class="booking-form" id="bookingForm">
+            <div class="form-group">
+              <label for="name">
+                <i class="fas fa-user"></i>
+                Full Name
+              </label>
+              <input type="text" id="name" name="name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="email">
+                <i class="fas fa-envelope"></i>
+                Email Address
+              </label>
+              <input type="email" id="email" name="email" required />
+            </div>
+
+            <div class="form-group">
+              <label for="mobile">
+                <i class="fas fa-phone"></i>
+                Mobile Number
+              </label>
+              <input type="tel" id="mobile" name="mobile" required />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="date">
+                  <i class="fas fa-calendar"></i>
+                  Preferred Date
+                </label>
+                <input type="date" id="date" name="date" required />
+              </div>
+
+              <div class="form-group">
+                <label for="time">
+                  <i class="fas fa-clock"></i>
+                  Preferred Time
+                </label>
+                <input type="time" id="time" name="time" required />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">
+              <i class="fas fa-calendar-check"></i>
+              <span>Book Appointment</span>
+              <div class="btn-loader"></div>
+            </button>
+          </form>
+
+          <div class="booking-sidebar">
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-info-circle"></i>
+              </div>
+              <div class="info-content">
+                <h4>Booking Information</h4>
+                <ul>
+                  <li><i class="fas fa-check"></i> Instant confirmation</li>
+                  <li><i class="fas fa-check"></i> Email reminder sent</li>
+                  <li><i class="fas fa-check"></i> Arrive 10 minutes early</li>
+                  <li><i class="fas fa-check"></i> Free cancellation</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="contact-card">
+              <h4>Need Help?</h4>
+              <p>Contact our support team</p>
+              <div class="contact-info">
+                <div class="contact-item">
+                  <i class="fas fa-phone"></i>
+                  <span>+1 (555) 123-4567</span>
+                </div>
+                <div class="contact-item">
+                  <i class="fas fa-envelope"></i>
+                  <span>support@appointzen.com</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+  </body>
+</html>

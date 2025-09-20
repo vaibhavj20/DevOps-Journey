@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AppointZen - Smart Appointment Booking</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <i class="fas fa-calendar-check"></i>
+          <span>AppointZen</span>
+        </div>
+        <div class="nav-menu">
+          <a href="#home" class="nav-link">Home</a>
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#about" class="nav-link">About</a>
+          <a href="#contact" class="nav-link">Contact</a>
+        </div>
+        <div class="nav-toggle">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1 class="hero-title">
+              Book Your Perfect
+              <span class="gradient-text">Appointment</span>
+            </h1>
+            <p class="hero-description">
+              Experience seamless appointment booking with AppointZen. Schedule
+              instantly, get confirmed immediately, and never miss an
+              appointment again.
+            </p>
+            <div class="hero-buttons">
+              <a href="/book" class="btn btn-primary">
+                <i class="fas fa-calendar-plus"></i>
+                Book Now
+              </a>
+              <a href="#features" class="btn btn-secondary">
+                <i class="fas fa-play"></i>
+                Learn More
+              </a>
+            </div>
+          </div>
+          <div class="hero-image">
+            <div class="floating-card card-1">
+              <i class="fas fa-clock"></i>
+              <span>Quick Booking</span>
+            </div>
+            <div class="floating-card card-2">
+              <i class="fas fa-bell"></i>
+              <span>Smart Reminders</span>
+            </div>
+            <div class="floating-card card-3">
+              <i class="fas fa-check-circle"></i>
+              <span>Instant Confirmation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">Why Choose Us</span>
+          <h2 class="section-title">
+            Everything you need for perfect appointments
+          </h2>
+          <p class="section-subtitle">
+            Experience the difference with our comprehensive booking solution
+            designed for modern needs
+          </p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="feature-content">
+              <h3>Lightning Fast</h3>
+              <p>
+                Book appointments in under 30 seconds with our streamlined,
+                intuitive interface
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-shield-check"></i>
+            </div>
+            <div class="feature-content">
+              <h3>Secure & Reliable</h3>
+              <p>
+                Your data is protected with enterprise-grade security and 99.9%
+                uptime guarantee
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-mobile-screen"></i>
+            </div>
+            <div class="feature-content">
+              <h3>Mobile Optimized</h3>
+              <p>
+                Perfect experience on any device - desktop, tablet, or
+                smartphone
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-calendar-days"></i>
+            </div>
+            <div class="feature-content">
+              <h3>Smart Scheduling</h3>
+              <p>
+                Intelligent calendar integration prevents conflicts and
+                optimizes your time
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-headset"></i>
+            </div>
+            <div class="feature-content">
+              <h3>24/7 Support</h3>
+              <p>
+                Get help whenever you need it with our dedicated customer
+                support team
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-chart-simple"></i>
+            </div>
+            <div class="feature-content">
+              <h3>Smart Analytics</h3>
+              <p>
+                Track patterns and insights to optimize your appointment
+                scheduling
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number">10K+</div>
+            <div class="stat-label">Happy Customers</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">50K+</div>
+            <div class="stat-label">Appointments Booked</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">99.9%</div>
+            <div class="stat-label">Uptime Guarantee</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Customer Support</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+      <div class="container">
+        <div class="cta-content">
+          <div class="cta-text">
+            <h2>Ready to Transform Your Scheduling?</h2>
+            <p>
+              Join thousands of satisfied customers who trust AppointZen for
+              seamless appointment management
+            </p>
+          </div>
+          <div class="cta-actions">
+            <a href="/book" class="btn btn-cta">
+              <i class="fas fa-calendar-plus"></i>
+              Start Booking Now
+            </a>
+            <div class="cta-features">
+              <span><i class="fas fa-check"></i> Free to use</span>
+              <span><i class="fas fa-check"></i> Instant setup</span>
+              <span><i class="fas fa-check"></i> No credit card required</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <div class="footer-logo">
+              <i class="fas fa-calendar-check"></i>
+              <span>AppointZen</span>
+            </div>
+            <p>
+              Making appointment booking simple, fast, and reliable for
+              everyone.
+            </p>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#features">Features</a></li>
+              <li><a href="/book">Book Now</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">FAQ</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Connect</h4>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 AppointZen. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
