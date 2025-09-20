@@ -1,0 +1,26 @@
+## Amz Linux 2023
+## instance with atleast 2GB RAM
+
+#### Install PHP, MySQL, Nginx:
+sudo hostnamectl set-hostname appsrv
+sudo dnf update
+sudo dnf install nginx -y
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+sudo dnf install php8.2 php-fpm php-mysqlnd php-pdo php-mbstring -y
+php -v
+
+
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+sudo systemctl restart nginx
+
+sudo yum install mariadb105 -y
+
+
+sudo chown -R nginx:nginx /usr/share/nginx/html/public
+sudo chmod -R 755 /usr/share/nginx/html/public
+
+sudo cp /usr/share/nginx/html/nginx/quickloan.conf   /etc/nginx/conf.d/
+sudo nginx -t
