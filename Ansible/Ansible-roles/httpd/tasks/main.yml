@@ -1,0 +1,20 @@
+---
+- name: Install Apache (Ubuntu)
+  ansible.builtin.apt:
+    name: apache2
+    state: present
+    update_cache: yes
+
+- name: Ensure Apache service is started and enabled
+  ansible.builtin.service:
+    name: apache2
+    state: started
+    enabled: yes
+
+- name: Copy index.html to web server with owner and permissions
+  ansible.builtin.copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: vaby20
+    group: root
+

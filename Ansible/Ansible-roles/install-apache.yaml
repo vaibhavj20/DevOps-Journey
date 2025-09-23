@@ -1,0 +1,9 @@
+---
+- name: Install apache and copy file with owner and permissions
+  hosts: localhost
+  become: true
+  roles: 
+    - httpd
+
+
+
