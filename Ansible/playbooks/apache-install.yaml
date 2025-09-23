@@ -1,0 +1,23 @@
+---
+- name: Install apache and copy file with owner and permissions
+  hosts: web
+  become: true
+  tasks:
+    - name: Install apache (httpd)
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+    - name: Ensure httpd service is started and enabled
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: yes
+    - name: Copy index.html to web server with owner and permissions
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/html/
+        owner: john
+        group: root
+
+
+
