@@ -26,3 +26,8 @@ override.tf.json
 .idea/
 .DS_Store
 Thumbs.db
+
+
+# SSH private/public keys
+terraform-key
+terraform-key.pub
