@@ -57,10 +57,13 @@ resource "aws_security_group" "my_security_group" {
 # ec2-instance
 
 resource "aws_instance" "my_ec2" {
-  count = 2  
+  for_each  = tomap ({
+    my_ec2_instance_micro = "t2.micro",
+    my_ec2_instance_small = "t2.small"
+  })  
   key_name        = aws_key_pair.my_key.key_name
   security_groups = [aws_security_group.my_security_group.name]
-  instance_type   = var.ec2_instane_type
+  instance_type   = each.value
   ami             = var.ec2_ami_id # amazon linux
   user_data       = file("install-nginx.sh")
 
@@ -72,7 +75,7 @@ resource "aws_instance" "my_ec2" {
   }
 
   tags = {
-    Name = "my_ec2_instance"
+    Name = each.key
   }
 }
 
