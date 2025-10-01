@@ -59,12 +59,12 @@ resource "aws_security_group" "my_security_group" {
 resource aws_instance "my_ec2" {
     key_name = aws_key_pair.my_key.key_name
     security_groups = [aws_security_group.my_security_group.name]
-    instance_type = "t2.micro"
-    ami = "ami-08982f1c5bf93d976" # amazon linux
+    instance_type = var.ec2_instane_type
+    ami = var.ec2_ami_id # amazon linux
 
 
     root_block_device {
-        volume_size = 8
+        volume_size = var.ec2_root_storage_size
         volume_type = "gp2"
 
     }
