@@ -1,0 +1,28 @@
+# Local .terraform directories
+.terraform/
+
+# State files
+*.tfstate
+*.tfstate.*
+
+# Crash log
+crash.log
+
+# Variable files (may contain secrets)
+*.tfvars
+*.tfvars.json
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Lock file (ignore for practice, commit in teams if needed)
+.terraform.lock.hcl
+
+# Editor/OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
