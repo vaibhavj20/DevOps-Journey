@@ -61,6 +61,7 @@ resource aws_instance "my_ec2" {
     security_groups = [aws_security_group.my_security_group.name]
     instance_type = var.ec2_instane_type
     ami = var.ec2_ami_id # amazon linux
+    user_data = file("install-nginx.sh")
 
 
     root_block_device {
