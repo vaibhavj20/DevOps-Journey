@@ -71,7 +71,7 @@ resource "aws_instance" "my_ec2" {
 
 
   root_block_device {
-    volume_size = var.ec2_root_storage_size
+    volume_size = var.env == "prod" ? 20 : var.ec2_default_root_storage_size
     volume_type = "gp2"
 
   }
@@ -81,3 +81,9 @@ resource "aws_instance" "my_ec2" {
   }
 }
 
+
+
+resource "aws_instance" "my_new_instance" {
+     ami = "unknown"
+     instance_type = "unknown"
+}
