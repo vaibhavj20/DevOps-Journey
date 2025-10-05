@@ -2,6 +2,9 @@
 resource "aws_key_pair" "my_key" {
   key_name   = "terraform-key"
   public_key = file("terraform-key.pub") # you can directly paste the public key here
+  tags = {
+  Environment = var.env
+  }
 }
 
 
