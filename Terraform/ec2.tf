@@ -22,6 +22,7 @@ resource "aws_security_group" "my_security_group" {
 
   tags = {
     Name = "my-security-group"
+    Environment = var.env 
   }
 
 
@@ -74,7 +75,7 @@ resource "aws_instance" "my_ec2" {
 
 
   root_block_device {
-    volume_size = var.env == "prod" ? 20 : var.ec2_default_root_storage_size
+    volume_size = var.env == "prod" ? 15 : var.ec2_default_root_storage_size
     volume_type = "gp2"
 
   }
