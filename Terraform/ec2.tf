@@ -1,6 +1,6 @@
 # key pair
 resource "aws_key_pair" "my_key" {
-  key_name   = "terraform-key"
+  key_name   = "terraform-key-${var.env}"
   public_key = file("terraform-key.pub") # you can directly paste the public key here
   tags = {
   Environment = var.env
@@ -16,7 +16,7 @@ resource "aws_default_vpc" "default" {
 
 
 resource "aws_security_group" "my_security_group" {
-  name        = "my-sg"
+  name        = "my-sg-${var.env}"
   description = "Allow SSH and HTTP"
   vpc_id      = aws_default_vpc.default.id # interpolation syntax 
 
