@@ -14,7 +14,7 @@ SonarQube is a code quality and security analysis tool that helps developers ide
 
 - **Instance Type**: t2.medium
 - **AMI**: Ubuntu 24.04 LTS
-- **Storage**: 20 GB EBS Volume
+- **Storage**: 10 GB EBS Volume
 - **Security Group**:
   - SSH (port 22)
   - Custom TCP (port 9000) - for SonarQube
