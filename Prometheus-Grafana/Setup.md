@@ -257,6 +257,32 @@ http://<grafana-public-ip>:3000
 7. Select **Prometheus** as the data source
 8. Click **Import**
 
+## How It Works
+
+### Monitoring Flow Architecture
+
+1. **Node Exporter (Agent)**:
+
+   - Runs on the Application Server as a monitoring agent
+   - Collects system metrics (CPU, Memory, Disk, Network) every 15 seconds
+   - Exposes metrics at `http://<application-server>:9100/metrics` endpoint
+   - Acts as a passive exporter - waits for Prometheus to scrape data
+
+2. **Prometheus (Metrics Collection)**:
+
+   - Configured to scrape Node Exporter endpoint every 15 seconds (default scrape interval)
+   - Pulls metrics data from the application server
+   - Stores time-series data in its local database
+   - Evaluates queries and provides data to Grafana
+
+3. **Grafana (Visualization)**:
+   - Queries Prometheus at regular intervals to fetch metrics
+   - Updates dashboards in real-time (configurable refresh rate)
+   - Displays data in various formats: graphs, charts, gauges, tables
+   - Provides historical data analysis and trend visualization
+
+**Data Flow**: Application Server → Node Exporter (collects) → Prometheus (pulls & stores) → Grafana (queries & visualizes)
+
 ## Verification
 
 You should now see:
@@ -281,13 +307,6 @@ You should now see:
 - Verify Node Exporter is running: `curl http://localhost:9100/metrics`
 - Check Prometheus targets status in UI
 - Review service logs for any errors
-
-## Next Steps
-
-- Add more application servers with Node Exporter
-- Create custom Grafana dashboards
-- Set up alerting rules in Prometheus
-- Configure alert notifications in Grafana
 
 ## License
 
