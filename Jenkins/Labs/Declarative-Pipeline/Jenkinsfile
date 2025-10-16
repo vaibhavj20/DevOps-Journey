@@ -1,0 +1,20 @@
+pipeline {
+    agent any 
+    stages {
+        stage("Hello"){
+            steps{
+                echo "Hello Friends!"
+            }
+        }
+        stage("Create Folder"){
+            steps{
+                sh "mkdir -p cicd-folder"
+            }
+        }
+        stage("Goodbye"){
+            steps {
+                echo "Goodbye Friends!"
+            }
+        }
+    }
+}
