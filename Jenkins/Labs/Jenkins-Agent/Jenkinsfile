@@ -1,0 +1,26 @@
+pipeline {
+    agent { label "agent1" }
+
+    stages {
+        stage("Hello") {
+            steps {
+                echo "Hello Friends!!"
+                echo "Running on Jenkins Agent!"
+            }
+        }
+
+        stage("Create Folder") {
+            steps {
+                sh "mkdir -p pipefolder"
+                sh "pwd"
+                sh "hostname"
+            }
+        }
+
+        stage("Bye") {
+            steps {
+                echo "Goodbye Friends!!"
+            }
+        }
+    }
+}
