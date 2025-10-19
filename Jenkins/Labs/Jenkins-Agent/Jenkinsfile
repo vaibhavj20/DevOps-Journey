@@ -1,6 +1,7 @@
 pipeline {
+    // Define the agent where the pipeline will run
     agent { label "agent1" }
-
+  
     stages {
         stage("Hello") {
             steps {
