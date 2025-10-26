@@ -17,11 +17,11 @@ Jenkins is an open-source automation server that helps automate the software dev
 1. Go to AWS Console → EC2 → Launch Instances
 2. Configure the following:
    - **AMI**: Amazon Linux 2023
-   - **Instance Type**: t2.micro
+   - **Instance Type**: t2.medium
    - **Storage**: 10 GB
    - **Key Pair**: Select your existing key pair
 3. Click **Launch Instance**
-4. Once running, rename the instance to `jenkins`
+4. Once running, rename the instance to `jenkins-master`
 
 ## Step 2: Connect to Jenkins Instance
 
@@ -32,7 +32,7 @@ ssh -i path\to\AWSOPEN.pem ec2-user@<jenkins-public-ip>
 ### Set Hostname
 
 ```bash
-sudo hostnamectl set-hostname jenkins
+sudo hostnamectl set-hostname jenkins-master
 exit
 ```
 
@@ -291,7 +291,7 @@ ls -la /var/lib/jenkins/
 
 - Check disk space: `df -h`
 - Monitor system resources: `top` or `htop`
-- Consider upgrading to t2.small or larger instance
+- Consider upgrading to t2.large or larger instance
 
 **Forgot admin password**
 
