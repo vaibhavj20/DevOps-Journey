@@ -1,0 +1,50 @@
+
+pipeline {
+    agent { label "agent1" }
+    
+    stages {
+        stage("Code") {
+            steps {
+                echo "Cloning the repository..."
+                git url: "https://github.com/vaibhavj20/django-notes-app-jenkins", branch: "main"
+                echo "Repository cloned successfully."
+            }
+        }
+        
+        stage("Build") {
+            steps {
+                echo "Building the Docker image..."
+                sh "docker build -t notes-app:latest ."
+                echo "Docker image built successfully."
+            }
+        }
+        
+        stage("Push to DockerHub") {
+            steps {
+                echo "Pushing image to DockerHub..."
+                withCredentials([usernamePassword(
+                    credentialsId: "dockerHubCreds",
+                    usernameVariable: "dockerHubUser",
+                    passwordVariable: "dockerHubPass"
+                )]) {
+                    sh '''
+                        echo "$dockerHubPass" | docker login -u "$dockerHubUser" --password-stdin
+                        docker tag notes-app:latest ${dockerHubUser}/notes-app:latest
+                        docker push ${dockerHubUser}/notes-app:latest
+                        docker logout
+                    '''
+                }
+                echo "Image pushed to DockerHub successfully."
+            }
+        }
+        
+        stage("Deploy") {
+            steps {
+                echo "Deploying the application..."
+                sh "docker run -d -p 8000:8000 notes-app:latest"
+            }
+        }
+    }
+}
+
+
