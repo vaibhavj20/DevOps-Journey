@@ -630,9 +630,9 @@ stage("Push to DockerHub") {
 
 ## Related Documentation
 
-- [Jenkins Master Setup](../Setup.md)
-- [Jenkins Agent Configuration](../Labs/Jenkins-Agent/)
-- [GitHub Webhook Integration](../Freestyle-project/Setup.md)
+- [Jenkins Master Setup](../../Setup.md)
+- [Jenkins Agent Configuration](../../Labs/Jenkins-Agent/README.md)
+- [GitHub Webhook Integration](../../Freestyle-project/Setup.md)
 
 ---
 
