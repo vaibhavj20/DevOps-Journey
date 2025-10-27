@@ -2,6 +2,8 @@
 
 A complete guide to set up automated deployment pipeline where GitHub code automatically deploys to an Apache web server through Jenkins using webhooks.
 
+> **Prerequisites**: This guide assumes you already have Jenkins installed and running. If not, follow the [Jenkins Installation Guide](link-to-master-guide) first.
+
 ## How This CI/CD Pipeline Works
 
 This setup creates an automated deployment workflow:
@@ -19,19 +21,19 @@ This setup creates an automated deployment workflow:
 
 We'll create two EC2 instances:
 
-- **Jenkins Server**: Automation server that handles CI/CD pipeline
-- **Application Server**: Apache web server that hosts your website
+- **Jenkins Server**: Already installed and running (from master guide)
+- **Application Server**: Apache web server that will host your website
 
-## Prerequisites
+## What You Need
 
-- AWS Account
+- AWS Account with running Jenkins instance
 - GitHub Account
-- SSH key pair (e.g., `AWSOPEN.pem`)
+- SSH key pair (same one used for Jenkins)
 - Basic understanding of Linux commands
 
 ---
 
-# Part 1: Setup GitHub Repository
+# Step 1: Setup GitHub Repository
 
 1. Go to GitHub and create a new repository
 2. Configure:
@@ -43,133 +45,71 @@ Keep this repository open - we'll use it later!
 
 ---
 
-# Part 2: Launch EC2 Instances
-
-## Create Jenkins Server
+# Step 2: Launch Application Server
 
 1. Go to AWS Console → EC2 → Launch Instances
 2. Configure:
-   - **Name**: `jenkins`
-   - **AMI**: Amazon Linux 2023
-   - **Instance Type**: t2.micro
-   - **Storage**: 10 GB
-   - **Key Pair**: Select your existing key pair
-3. Click **Launch Instance**
-
-## Create Application Server
-
-1. Launch another instance with:
    - **Name**: `application`
-   - **AMI**: Amazon Linux 2023
+   - **AMI**: Amazon Linux 2023 OR Ubuntu 22.04/24.04 LTS
    - **Instance Type**: t2.micro
    - **Storage**: 8 GB (default)
    - **Key Pair**: Same key pair as Jenkins
-2. Click **Launch Instance**
+3. Click **Launch Instance**
 
 ---
 
-# Part 3: Setup Jenkins Server
+# Step 3: Install Git on Jenkins Server
 
-## Connect to Jenkins Instance
+Jenkins needs Git to clone repositories from GitHub.
+
+## Connect to Jenkins Server
+
+### For Amazon Linux
 
 ```bash
 ssh -i path/to/AWSOPEN.pem ec2-user@<jenkins-public-ip>
 ```
 
-### Set Hostname
+### For Ubuntu
 
 ```bash
-sudo hostnamectl set-hostname jenkins
-exit
+ssh -i path/to/AWSOPEN.pem ubuntu@<jenkins-public-ip>
 ```
 
-Reconnect to see the updated hostname.
+## Install Git
 
-### Fix /tmp Space Issue (IMPORTANT!)
-
-Before installing Jenkins, we must allocate more space to `/tmp`:
-
-```bash
-# Check current disk usage
-df -h
-
-# Temporary fix - allocate 2GB to /tmp
-sudo mount -o remount,size=2G /tmp
-
-# Permanent fix - edit fstab
-sudo nano /etc/fstab
-```
-
-Add this line at the end of the file:
-
-```
-tmpfs /tmp tmpfs defaults,noatime,size=2G 0 0
-```
-
-Save and exit (Ctrl+X, Y, Enter).
-
-```bash
-# Apply changes
-sudo mount -o remount /tmp
-
-# Verify 2GB space
-df -h
-```
-
-### Install Jenkins
-
-```bash
-# Update system
-sudo yum update -y
-
-# Install Java 21
-sudo dnf install java-21-amazon-corretto -y
-
-# Verify Java installation
-java -version
-
-# Install wget
-sudo yum install wget -y
-
-# Download Jenkins repository
-sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
-
-# Import Jenkins GPG key
-sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
-
-# Install Jenkins
-sudo dnf install jenkins -y
-
-# Start Jenkins service
-sudo systemctl enable --now jenkins
-```
-
-### Install Git on Jenkins Server
-
-Jenkins needs Git to clone repositories:
+### On Amazon Linux Jenkins
 
 ```bash
 sudo yum install git -y
+```
 
-# Verify Git installation
+### On Ubuntu Jenkins
+
+```bash
+sudo apt update
+sudo apt install git -y
+```
+
+### Verify Installation
+
+```bash
 git --version
 ```
 
-### Configure Security Group for Jenkins
+---
 
-Add inbound rule:
+# Step 4: Setup Application Server
 
-- **Type**: Custom TCP
-- **Port**: 8080
-- **Source**: 0.0.0.0/0
+Open a new terminal and connect to the application server.
+
+Choose the appropriate section based on your Application Server OS:
 
 ---
 
-# Part 4: Setup Application Server
+## Option A: Amazon Linux Application Server
 
-Open a new terminal tab and connect to the application server.
-
-## Connect to Application Instance
+### Connect to Instance
 
 ```bash
 ssh -i path/to/AWSOPEN.pem ec2-user@<application-public-ip>
@@ -182,7 +122,7 @@ sudo hostnamectl set-hostname application
 exit
 ```
 
-Reconnect to continue.
+Reconnect to see the updated hostname.
 
 ### Install Apache Web Server
 
@@ -193,28 +133,26 @@ sudo yum install httpd -y
 
 ### Configure Directory Permissions
 
-By default, Apache's web directory `/var/www/html` is owned by `root`. We need to change ownership to `ec2-user` so Jenkins can transfer files via SSH without root privileges.
+By default, Apache's web directory `/var/www/html` is owned by `root`. We need to change ownership to `ec2-user` so Jenkins can transfer files via SSH.
 
 **Why change ownership to ec2-user?**
 
 - Jenkins connects via SSH as `ec2-user` (not root)
 - Root SSH access is disabled by default for security
-- `ec2-user` is the default user on Amazon Linux
 - Allows Jenkins to write files without sudo permissions
-- Maintains security by not exposing root access
 
 ```bash
 # Navigate to Apache directory
 cd /var/www/
 
-# Check current ownership (before)
+# Check current ownership
 ls -la
 # You'll see: drwxr-xr-x root root html
 
 # Change ownership to ec2-user
 sudo chown -R ec2-user:ec2-user /var/www/html
 
-# Verify ownership changed (after)
+# Verify ownership changed
 ls -la
 # You'll now see: drwxr-xr-x ec2-user ec2-user html
 ```
@@ -229,9 +167,9 @@ sudo systemctl enable --now httpd
 sudo systemctl status httpd
 ```
 
-### Configure Security Group for Application Server
+### Configure Security Group
 
-Add inbound rule:
+Add inbound rule to Application Server:
 
 - **Type**: HTTP
 - **Port**: 80
@@ -245,83 +183,136 @@ Open browser and navigate to:
 http://<application-public-ip>
 ```
 
-You should see the default Apache page: **"It Works!"**
+You should see the default Apache page: **"It Works!"** or **"Test Page"**
 
 ---
 
-# Part 5: Configure Jenkins
+## Option B: Ubuntu Application Server
 
-## Access Jenkins Web Interface
-
-Open browser:
-
-```
-http://<jenkins-public-ip>:8080
-```
-
-### Unlock Jenkins
-
-1. Copy the red path shown on screen: `/var/lib/jenkins/secrets/initialAdminPassword`
-2. In Jenkins terminal, run:
+### Connect to Instance
 
 ```bash
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+ssh -i path/to/AWSOPEN.pem ubuntu@<application-public-ip>
 ```
 
-3. Copy the password and paste into browser
-4. Click **Continue**
+### Set Hostname
 
-### Install Suggested Plugins
+```bash
+sudo hostnamectl set-hostname application
+exit
+```
 
-Click **Install suggested plugins** and wait for installation to complete.
+Reconnect to see the updated hostname.
 
-### Create Admin User
+### Install Apache Web Server
 
-Set up your admin credentials:
+```bash
+# Update packages
+sudo apt update
 
-- Username: (your choice)
-- Password: (secure password)
-- Confirm password
-- Full name
-- Email
+# Install Apache HTTP Server
+sudo apt install apache2 -y
+```
 
-Click **Save and Continue** → **Save and Finish** → **Start using Jenkins**
+### Configure Directory Permissions
+
+By default, Apache's web directory `/var/www/html` is owned by `root`. We need to change ownership to `ubuntu` so Jenkins can transfer files via SSH.
+
+**Why change ownership to ubuntu?**
+
+- Jenkins connects via SSH as `ubuntu` (not root)
+- Root SSH access is disabled by default for security
+- Allows Jenkins to write files without sudo permissions
+
+```bash
+# Navigate to Apache directory
+cd /var/www/
+
+# Check current ownership
+ls -la
+# You'll see: drwxr-xr-x root root html
+
+# Change ownership to ubuntu
+sudo chown -R ubuntu:ubuntu /var/www/html
+
+# Verify ownership changed
+ls -la
+# You'll now see: drwxr-xr-x ubuntu ubuntu html
+```
+
+### Start Apache Service
+
+```bash
+# Enable and start Apache
+sudo systemctl enable --now apache2
+
+# Verify Apache is running
+sudo systemctl status apache2
+```
+
+### Configure Security Group
+
+Add inbound rule to Application Server:
+
+- **Type**: HTTP
+- **Port**: 80
+- **Source**: 0.0.0.0/0
+
+### Test Apache
+
+Open browser and navigate to:
+
+```
+http://<application-public-ip>
+```
+
+You should see the default Apache/Ubuntu page.
 
 ---
 
-# Part 6: Install Required Jenkins Plugin
+# Step 5: Install Jenkins Plugin
 
 ## Install "Publish Over SSH" Plugin
 
 This plugin allows Jenkins to transfer files to the application server via SSH.
 
-1. Go to **Dashboard** → **Manage Jenkins** → **Plugins**
-2. Click **Available plugins**
-3. Search for: `Publish Over SSH`
-4. Select the checkbox
-5. Click **Install** (at the top)
-6. Wait for installation to complete
+1. Go to Jenkins: `http://<jenkins-public-ip>:8080`
+2. Navigate to **Dashboard** → **Manage Jenkins** → **Plugins**
+3. Click **Available plugins**
+4. Search for: `Publish Over SSH`
+5. Select the checkbox
+6. Click **Install** (at the top)
+7. Wait for installation to complete
 
 ---
 
-# Part 7: Configure SSH Connection to Application Server
+# Step 6: Configure SSH Connection to Application Server
 
 ## Add SSH Private Key to Jenkins
 
 1. Go to **Dashboard** → **Manage Jenkins** → **System**
 2. Scroll down to **Publish over SSH** section
 3. In the **Key** textarea:
-   - Open your `.pem` file (e.g., `AWSOPEN.pem`) in Notepad
+   - Open your `.pem` file (e.g., `AWSOPEN.pem`) in a text editor
    - Copy the entire content (including `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----`)
    - Paste into the **Key** field
 
 ## Add SSH Server Details
 
-Click **Add** under SSH Servers and configure:
+Click **Add** under SSH Servers and configure based on your Application Server OS:
+
+### For Amazon Linux Application Server
 
 - **Name**: `application-server` (any meaningful name)
 - **Hostname**: `<application-server-public-ip>`
 - **Username**: `ec2-user`
+- **Remote Directory**: `/var/www/html`
+
+### For Ubuntu Application Server
+
+- **Name**: `application-server` (any meaningful name)
+- **Hostname**: `<application-server-public-ip>`
+- **Username**: `ubuntu`
 - **Remote Directory**: `/var/www/html`
 
 Click **Test Configuration** - you should see **Success**!
@@ -330,7 +321,7 @@ Click **Save**
 
 ---
 
-# Part 8: Configure GitHub Webhook
+# Step 7: Configure GitHub Webhook
 
 Webhooks allow GitHub to automatically notify Jenkins when code is pushed.
 
@@ -351,15 +342,16 @@ http://<jenkins-public-ip>:8080/github-webhook/
 3. Configure:
    - **Payload URL**: `http://<jenkins-public-ip>:8080/github-webhook/`
    - **Content type**: `application/json`
-   - **SSL verification**: Disable SSL verification (for testing)
+   - **SSL verification**: Disable SSL verification (for testing with HTTP)
    - **Which events**: Just the push event
+   - **Active**: ✅ Checked
 4. Click **Add webhook**
 
-You'll see: "This hook has not been triggered yet" (this is normal)
+You'll see a message: "We'll send a ping to test it out" - this is normal. The webhook will show a green checkmark once it successfully connects to Jenkins.
 
 ---
 
-# Part 9: Create Jenkins Freestyle Project
+# Step 8: Create Jenkins Freestyle Project
 
 ## Create New Project
 
@@ -382,17 +374,13 @@ Select: **Git**
 
 - **Repository URL**: Paste your GitHub repository URL with `.git` at the end
   - Example: `https://github.com/username/my-website.git`
-- **Branch Specifier**: `*/main` (not `*/master`)
+- **Branch Specifier**: `*/main` (or `*/master` if your default branch is master)
 
 ### Build Triggers
 
 ✅ Check: **GitHub hook trigger for GITScm polling**
 
 This enables automatic builds when GitHub webhook triggers.
-
-### Build Environment
-
-✅ Check: **Send files or execute commands over SSH after the build runs**
 
 ### Post-build Actions
 
@@ -401,15 +389,16 @@ Click **Add post-build action** → **Send build artifacts over SSH**
 Configure:
 
 - **SSH Server**: Select `application-server` (the name you configured earlier)
-- **Source files**: `**/*.*` (transfers all files)
-- **Remove prefix**: (leave empty)
-- **Remote directory**: `/` (uploads to `/var/www/html`)
+- **Transfers**:
+  - **Source files**: `**/*`
+  - **Remove prefix**: (leave empty)
+  - **Remote directory**: (leave empty - already set to `/var/www/html` in SSH config)
 
 Click **Save**
 
 ---
 
-# Part 10: Add Website Code to GitHub
+# Step 9: Create and Push Website Code
 
 Now let's create a simple website and push it to GitHub.
 
@@ -490,7 +479,7 @@ Create a folder on your computer with these files:
     </section>
 
     <footer id="contact">
-      <p>Built with ❤️ by Vaibhav Jamdhade</p>
+      <p>Built with ❤️ using Jenkins CI/CD</p>
       <p>Automated Deployment Demo</p>
     </footer>
   </body>
@@ -689,6 +678,8 @@ footer {
 
 ## Push Code to GitHub
 
+Open terminal in your project folder and run:
+
 ```bash
 # Initialize git repository
 git init
@@ -699,7 +690,7 @@ git add .
 # Commit
 git commit -m "Initial website deployment"
 
-# Add remote repository
+# Add remote repository (replace with your GitHub URL)
 git remote add origin https://github.com/username/my-website.git
 
 # Push to GitHub
@@ -709,18 +700,18 @@ git push -u origin main
 
 ---
 
-# Part 11: Test the CI/CD Pipeline
+# Step 10: Test the CI/CD Pipeline
 
 ## Automatic Deployment
 
 Once you push code to GitHub:
 
 1. **GitHub webhook** triggers Jenkins automatically
-2. Go to Jenkins Dashboard
-3. You'll see your project building (blue progress bar)
+2. Go to Jenkins Dashboard: `http://<jenkins-public-ip>:8080`
+3. You'll see your project building (blue progress bar or building icon)
 4. Click on the build number (e.g., `#1`)
-5. Click **Console Output** to see logs
-6. Wait for "Finished: SUCCESS"
+5. Click **Console Output** to see real-time logs
+6. Wait for **"Finished: SUCCESS"** message
 
 ## View Your Website
 
@@ -734,20 +725,34 @@ You should see your beautiful deployed website! 🎉
 
 ## Test Automatic Updates
 
-Make a change to your code:
+Make a change to your code locally:
 
 ```bash
 # Edit index.html - change the heading
 nano index.html
-# Change "Welcome to My Website" to "Welcome to My Updated Website"
+# Change "Welcome to My Website" to "Welcome to My UPDATED Website"
 
 # Commit and push
 git add .
-git commit -m "Update heading"
+git commit -m "Update website heading"
 git push
 ```
 
-Watch Jenkins automatically build and deploy! Refresh your browser to see the changes.
+Watch Jenkins automatically build and deploy! Refresh your browser to see the changes within seconds.
+
+---
+
+# Quick Reference: OS-Specific Details
+
+| Component                 | Amazon Linux                | Ubuntu                        |
+| ------------------------- | --------------------------- | ----------------------------- |
+| **Jenkins SSH User**      | `ec2-user`                  | `ubuntu`                      |
+| **Application SSH User**  | `ec2-user`                  | `ubuntu`                      |
+| **Install Git (Jenkins)** | `sudo yum install git -y`   | `sudo apt install git -y`     |
+| **Install Apache**        | `sudo yum install httpd -y` | `sudo apt install apache2 -y` |
+| **Apache Service Name**   | `httpd`                     | `apache2`                     |
+| **Directory Owner**       | `ec2-user:ec2-user`         | `ubuntu:ubuntu`               |
+| **Web Root**              | `/var/www/html`             | `/var/www/html`               |
 
 ---
 
@@ -755,86 +760,152 @@ Watch Jenkins automatically build and deploy! Refresh your browser to see the ch
 
 1. **Developer Workflow**:
 
-   - You write code locally
-   - Push to GitHub repository
+   - Write code locally
+   - Push to GitHub repository (`git push`)
 
 2. **GitHub Webhook**:
 
-   - Detects push event
-   - Sends notification to Jenkins
+   - Detects push event immediately
+   - Sends HTTP POST to Jenkins webhook URL
 
 3. **Jenkins Automation**:
 
    - Receives webhook trigger
    - Clones latest code from GitHub
-   - Packages all files
+   - Packages all files (`**/*`)
 
-4. **SSH Transfer**:
+4. **SSH Transfer** (via Publish Over SSH):
 
-   - Jenkins connects to Application Server via SSH
+   - Jenkins connects to Application Server
    - Transfers files to `/var/www/html`
+   - Uses private key authentication
 
 5. **Apache Server**:
    - Automatically serves updated files
+   - No restart needed
    - Website updates instantly
 
-**Result**: Every code push = Automatic deployment = Zero manual work!
+**Result**: Push code → Auto deploy → Live in seconds! 🚀
 
 ---
 
 # Troubleshooting
 
-**Jenkins build fails with "Permission denied"**
+### Jenkins build fails with "Permission denied"
 
-- Check ownership of `/var/www/html` on application server
-- Ensure `ec2-user` owns the directory
+**Solution for Amazon Linux**:
 
-**Webhook not triggering Jenkins**
+```bash
+sudo chown -R ec2-user:ec2-user /var/www/html
+```
+
+**Solution for Ubuntu**:
+
+```bash
+sudo chown -R ubuntu:ubuntu /var/www/html
+```
+
+### Webhook not triggering Jenkins
 
 - Verify webhook URL ends with `/github-webhook/`
-- Check Jenkins is accessible from internet
-- Review GitHub webhook delivery logs
+- Check Jenkins security group allows port 8080
+- Review GitHub webhook delivery logs (Settings → Webhooks → Recent Deliveries)
+- Ensure webhook payload URL uses HTTP (not HTTPS) if you don't have SSL
 
-**Files not transferring to application server**
+### SSH Test Configuration fails
 
-- Test SSH configuration in Jenkins
-- Verify security groups allow SSH (port 22)
-- Check application server SSH is running
+- Verify Application Server security group allows SSH (port 22) from Jenkins
+- Check correct username (`ec2-user` for Amazon Linux, `ubuntu` for Ubuntu)
+- Ensure private key is copied correctly (including BEGIN/END lines)
+- Verify Application Server is running
 
-**Website not updating**
+### Files not transferring to application server
 
-- Clear browser cache (Ctrl+Shift+R)
-- Check Apache is running: `sudo systemctl status httpd`
-- Verify files are in `/var/www/html`
+- Check SSH connection works: `ssh -i key.pem user@app-server-ip`
+- Verify `/var/www/html` has correct ownership
+- Check Jenkins Console Output for detailed error messages
+- Test SSH configuration in Jenkins System settings
+
+### Website shows 403 Forbidden (Ubuntu only)
+
+Ubuntu's Apache has stricter default permissions:
+
+```bash
+sudo chmod -R 755 /var/www/html
+```
+
+### Website not updating after push
+
+- Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)
+- Check Apache is running:
+  - Amazon Linux: `sudo systemctl status httpd`
+  - Ubuntu: `sudo systemctl status apache2`
+- Verify files transferred: `ls -la /var/www/html`
+- Check Jenkins build succeeded (green checkmark)
+
+### Apache won't start
+
+**Amazon Linux**:
+
+```bash
+sudo systemctl restart httpd
+sudo journalctl -u httpd -n 50
+```
+
+**Ubuntu**:
+
+```bash
+sudo systemctl restart apache2
+sudo journalctl -u apache2 -n 50
+```
 
 ---
 
 # Important Notes
 
+## Jenkins Details
+
 - **Jenkins URL**: `http://<jenkins-public-ip>:8080`
-- **Application URL**: `http://<application-public-ip>`
-- **Apache Root Directory**: `/var/www/html`
+- **Webhook URL**: `http://<jenkins-public-ip>:8080/github-webhook/`
 - **Jenkins Home**: `/var/lib/jenkins/`
 
-## Security Best Practices
+## Application Server Details
 
-- Use Elastic IP for Jenkins to avoid webhook URL changes
-- Restrict security groups to specific IPs
-- Use HTTPS for production deployments
-- Store sensitive data in Jenkins credentials
-- Regularly update Jenkins and plugins
+- **Application URL**: `http://<application-public-ip>`
+- **Web Root**: `/var/www/html`
+- **Apache Service**: `httpd` (Amazon Linux) or `apache2` (Ubuntu)
+
+## Security Group Requirements
+
+- **Jenkins**: Port 8080 (HTTP), Port 22 (SSH)
+- **Application**: Port 80 (HTTP), Port 22 (SSH from Jenkins)
+
+---
+
+# Production Best Practices
+
+- ✅ **Use Elastic IP**: Attach Elastic IPs to avoid IP changes
+- ✅ **HTTPS Setup**: Configure SSL/TLS with Let's Encrypt
+- ✅ **Restrict Access**: Limit security groups to specific IPs
+- ✅ **Backup Strategy**: Regularly backup `/var/lib/jenkins/`
+- ✅ **Secret Management**: Use Jenkins credentials for sensitive data
+- ✅ **Branch Protection**: Use separate branches for dev/staging/production
+- ✅ **Testing**: Add automated tests before deployment
+- ✅ **Monitoring**: Set up CloudWatch or logging for both servers
+- ✅ **Updates**: Keep Jenkins, plugins, and OS packages updated
 
 ---
 
 # What You've Built
 
-✅ Automated CI/CD pipeline with Jenkins
+✅ Complete automated CI/CD pipeline
 ✅ GitHub webhook integration
-✅ Automated deployment to Apache server
+✅ Automated deployment to Apache web server
 ✅ Beautiful responsive website
-✅ Complete DevOps workflow
+✅ Zero-downtime deployment workflow
+✅ Production-ready DevOps setup
 
-Every time you push code to GitHub, your website updates automatically - just like real companies do it!
+Every time you push code to GitHub, your website updates automatically within seconds - just like Netflix, Amazon, and other tech companies! 🚀
 
 ---
 
