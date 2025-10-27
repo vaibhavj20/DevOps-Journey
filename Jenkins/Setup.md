@@ -1,6 +1,6 @@
 # Jenkins CI/CD Server Setup on AWS
 
-A complete guide to set up Jenkins automation server on AWS EC2 instance with troubleshooting for common issues.
+A complete guide to set up Jenkins automation server on AWS EC2 instance with support for both Amazon Linux and Ubuntu, including troubleshooting for common issues.
 
 ## What is Jenkins?
 
@@ -16,7 +16,7 @@ Jenkins is an open-source automation server that helps automate the software dev
 
 1. Go to AWS Console → EC2 → Launch Instances
 2. Configure the following:
-   - **AMI**: Amazon Linux 2023
+   - **AMI**: Amazon Linux 2023 OR Ubuntu 22.04/24.04 LTS
    - **Instance Type**: t2.medium
    - **Storage**: 10 GB
    - **Key Pair**: Select your existing key pair
@@ -25,8 +25,16 @@ Jenkins is an open-source automation server that helps automate the software dev
 
 ## Step 2: Connect to Jenkins Instance
 
+### For Amazon Linux
+
 ```bash
 ssh -i path\to\AWSOPEN.pem ec2-user@<jenkins-public-ip>
+```
+
+### For Ubuntu
+
+```bash
+ssh -i path\to\AWSOPEN.pem ubuntu@<jenkins-public-ip>
 ```
 
 ### Set Hostname
@@ -40,9 +48,13 @@ Reconnect via SSH to see the updated hostname.
 
 ## Step 3: Install Jenkins
 
-### Update System & Install Java
+Choose the installation method based on your EC2 instance's operating system.
 
-Jenkins requires Java to run. We'll install Java 21 (LTS):
+---
+
+### Option A: Amazon Linux 2023
+
+#### Update System & Install Java
 
 ```bash
 # Update system packages
@@ -58,7 +70,7 @@ java -version
 sudo yum install wget -y
 ```
 
-### Add Jenkins Repository
+#### Add Jenkins Repository
 
 ```bash
 # Download Jenkins repository configuration
@@ -68,7 +80,7 @@ sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/
 sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 ```
 
-### Install Jenkins
+#### Install Jenkins
 
 ```bash
 # Install Jenkins
@@ -77,6 +89,54 @@ sudo dnf install jenkins -y
 # Enable and start Jenkins service
 sudo systemctl enable --now jenkins
 ```
+
+---
+
+### Option B: Ubuntu 22.04/24.04
+
+#### Update System & Install Java
+
+```bash
+# Update system packages
+sudo apt update
+
+# Install Java 21 (OpenJDK)
+sudo apt install openjdk-21-jdk -y
+
+# Verify Java installation
+java -version
+
+# Install prerequisites
+sudo apt install wget gnupg -y
+```
+
+#### Add Jenkins Repository
+
+```bash
+# Add Jenkins repository key
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+
+# Add Jenkins repository
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+# Update package list
+sudo apt update
+```
+
+#### Install Jenkins
+
+```bash
+# Install Jenkins
+sudo apt install jenkins -y
+
+# Enable and start Jenkins service
+sudo systemctl enable --now jenkins
+```
+
+---
 
 Jenkins will now start automatically and run on port **8080**.
 
@@ -264,6 +324,15 @@ ls -la /var/lib/jenkins/
 - **Configuration File**: `/var/lib/jenkins/jenkins.model.JenkinsLocationConfiguration.xml`
 - **Initial Admin Password**: `/var/lib/jenkins/secrets/initialAdminPassword`
 
+## Quick Reference: OS-Specific Commands
+
+| Task            | Amazon Linux                 | Ubuntu                       |
+| --------------- | ---------------------------- | ---------------------------- |
+| Update packages | `sudo yum update -y`         | `sudo apt update`            |
+| Install package | `sudo dnf install <package>` | `sudo apt install <package>` |
+| Java package    | `java-21-amazon-corretto`    | `openjdk-21-jdk`             |
+| SSH user        | `ec2-user`                   | `ubuntu`                     |
+
 ## Production Best Practices
 
 - **Use Elastic IP**: Attach an Elastic IP to your instance to avoid IP changes
@@ -298,6 +367,11 @@ ls -la /var/lib/jenkins/
 - Disable security temporarily to reset password
 - Edit `/var/lib/jenkins/config.xml`
 - Or reinstall Jenkins (backup data first!)
+
+**Installation Issues on Ubuntu**
+
+- If you get "package not found" errors, ensure you've run `sudo apt update` after adding the Jenkins repository
+- For Java installation issues, try `sudo apt install default-jdk` as an alternative
 
 ## License
 
