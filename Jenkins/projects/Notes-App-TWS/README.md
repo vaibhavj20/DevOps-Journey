@@ -2,7 +2,7 @@
 
 A guide to create a Jenkins pipeline that builds a Docker image from GitHub, pushes it to DockerHub, and deploys the application automatically.
 
-> **Prerequisites**: This guide assumes you already have Jenkins Master and Agent configured. If not, complete the [Jenkins Master Setup](../../Setup.md) and [Jenkins Agent Setup](../../Freestyle-project/Setup.md) first.
+> **Prerequisites**: This guide assumes you already have Jenkins Master and Agent configured. If not, complete the [Jenkins Master Setup](../../Setup.md) and [Jenkins Agent Setup](../../Labs/Jenkins-Agent/README.md) first.
 
 ## What This Pipeline Does
 
