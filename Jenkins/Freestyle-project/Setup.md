@@ -2,7 +2,7 @@
 
 A complete guide to set up automated deployment pipeline where GitHub code automatically deploys to an Apache web server through Jenkins using webhooks.
 
-> **Prerequisites**: This guide assumes you already have Jenkins installed and running. If not, follow the [Jenkins Installation Guide](link-to-master-guide) first.
+> **Prerequisites**: This guide assumes you already have Jenkins installed and running. If not, follow the [Jenkins Installation Guide](../Setup.md) first.
 
 ## How This CI/CD Pipeline Works
 
