@@ -1,0 +1,23 @@
+@Library("Shared") _
+
+pipeline {
+    agent { label "agent1" }
+    
+    stages {
+        stage("Hello") {
+            steps {
+                script {
+                    hello()
+                }
+            }
+        }
+        
+        stage("Printing greet messages") {
+            steps {
+                script {
+                    printmsg("Vaibhav", 5)
+                }
+            }
+        }
+    }
+}
